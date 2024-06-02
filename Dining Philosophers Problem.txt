@@ -1,3 +1,5 @@
+DINING PHILOSOPHERS PROBLEM
+
 The Dining Philosopher Problem states that K philosophers are seated around a circular table with one chopstick between each pair of philosophers. There is one chopstick between each philosopher. A philosopher may 
 eat if he can pick up the two chopsticks adjacent to him. One chopstick may be picked up by any one of its adjacent followers but not both. 
 
@@ -39,3 +41,34 @@ repeat
     activate( right neighbor);
    {think}
 forever
+
+The steps for the Dining Philosopher Problem solution using semaphores are as follows:-
+1. Initialize the semaphores for each fork to 1 (indicating that they are available).
+2. Initialize a binary semaphore (mutex) to 1 to ensure that only one philosopher can attempt to pick up a fork at a time.
+3. For each philosopher process, create a separate thread that executes the following code:
+   While true:
+    Think for a random amount of time.
+    Acquire the mutex semaphore to ensure that only one philosopher can attempt to pick up a fork at a time.
+    Attempt to acquire the semaphore for the fork to the left.
+    If successful, attempt to acquire the semaphore for the fork to the right.
+    If both forks are acquired successfully, eat for a random amount of time and then release both semaphores.
+    If not successful in acquiring both forks, release the semaphore for the fork to the left (if acquired) and then
+    release the mutex semaphore and go back to thinking.
+4. Run the philosopher threads concurrently.
+
+Problem with Dining Philosopher:-
+We have demonstrated that no two nearby philosophers can eat at the same time from the aforementioned solution to the
+dining philosopher problem. The problem with the above solution is that it might result in a deadlock situation. If
+every philosopher picks their left chopstick simultaneously, a deadlock results, and no philosopher can eat. This
+situation occurs when this happens.
+
+Some solutions for this problem:-
+1. The maximum number of philosophers at the table should not exceed four; in this case, philosopher P3 will have accessto chopstick C4; he will then begin eating, and when he is finished, he will put down both 
+   chopsticks C3 and C4; as a result, semaphore C3 and C4 will now be incremented to 1.
+2. Now that philosopher P2, who was holding chopstick C2, will also have chopstick C3, he will do the same when finished eating, allowing other philosophers to eat.
+3. While a philosopher in an odd position should select the right chopstick first, a philosopher in an even position should select the left chopstick and then the right chopstick.
+4. A philosopher should only be permitted to choose their chopsticks if both of the available chopsticks (the left and the right) are available at the same time.
+5. All four of the initial philosophers (P0, P1, P2, and P3) should choose the left chopstick before choosing the right,while P4 should choose the right chopstick before choosing the left. As a result, P4 will be 
+   forced to hold his right chopstick first because his right chopstick, C0, is already being held by philosopher P0 and its value is set to 0. As a result, P4 will become trapped in an infinite loop and 
+   chopstick C4 will remain empty. As a result, philosopher P3 has both the left C3 and the right C4. chopstick available, therefore it will start eating and will put down both chopsticks once finishes and let 
+   others eat which removes the problem of deadlock.
