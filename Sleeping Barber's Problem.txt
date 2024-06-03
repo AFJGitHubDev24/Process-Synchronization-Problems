@@ -1,0 +1,98 @@
+Sleeping Barber problem in Process Synchronization
+--------------------------------------------------
+
+The Sleeping Barber problem is a classic problem in process synchronization that is used to illustrate synchronization 
+issues that can arise in a concurrent system. The problem is as follows:
+
+There is a barber shop with one barber and a number of chairs for waiting customers. Customers arrive at random times
+and if there is an available chair, they take a seat and wait for the barber to become available. If there are no chairs
+available, the customer leaves. When the barber finishes with a customer, he checks if there are any waiting customers.
+If there are, he begins cutting the hair of the next customer in the queue. If there are no customers waiting, he goes
+to sleep.
+
+The problem is to write a program that coordinates the actions of the customers and the barber in a way that avoids
+synchronization problems, such as deadlock or starvation.
+
+One solution to the Sleeping Barber problem is to use semaphores to coordinate access to the waiting chairs and the
+barber chair.
+
+Solution :
+The solution to this problem includes three semaphores.First is for the customer which counts the number of
+customers present in the waiting room (customer in the barber chair is not included because he is not waiting). Second,
+the barber 0 or 1 is used to tell whether the barber is idle or is working, And the third mutex is used to provide the
+mutual exclusion which is required for the process to execute. In the solution, the customer has the record of the
+number of customers waiting in the waiting room if the number of customers is equal to the number of chairs in the
+waiting room then the upcoming customer leaves the barbershop. When the barber shows up in the morning, he executes the
+procedure barber, causing him to block on the semaphore customers because it is initially 0. Then the barber goes to
+sleep until the first customer comes up. When a customer arrives, he executes customer procedure the customer acquires
+the mutex for entering the critical region, if another customer enters thereafter, the second one will not be able to
+anything until the first one has released the mutex. The customer then checks the chairs in the waiting room if waiting
+customers are less then the number of chairs then he sits otherwise he leaves and releases the mutex. If the chair is
+available then customer sits in the waiting room and increments the variable waiting value and also increases the
+customer’s semaphore this wakes up the barber if he is sleeping. At this point, customer and barber are both awake and
+the barber is ready to give that person a haircut. When the haircut is over, the customer exits the procedure and if
+there are no customers in waiting room barber sleeps.
+
+Algorithm for Sleeping Barber Problem:
+Semaphore Customers = 0;
+Semaphore Barber = 0;
+Mutex Seats = 1;
+int FreeSeats = N;
+Barber {
+	while(true) {
+			/* waits for a customer (sleeps). */
+			down(Customers);
+            /* mutex to protect the number of available seats.*/
+			down(Seats);
+            /* a chair gets free.*/
+			FreeSeats++;
+            /* bring customer for haircut.*/
+			up(Barber);
+            /* release the mutex on the chair.*/
+			up(Seats);
+			/* barber is cutting hair.*/
+	}
+}
+
+Customer {
+	while(true) {
+			/* protects seats so only 1 customer tries to sit
+			in a chair if that's the case.*/
+			down(Seats); //This line should not be here.
+			if(FreeSeats > 0){
+                /* sitting down.*/
+				FreeSeats--
+				/* notify the barber. */
+				up(Customers);
+				/* release the lock */
+				up(Seats);
+                /* wait in the waiting room if barber is busy. */
+				down(Barber);
+				// customer is having hair cut
+			}
+			else{
+				/* release the lock */
+				up(Seats);
+				// customer leaves
+			}
+	}
+}
+
+Advantages:
+1. Efficient use of resources: The use of semaphores or other synchronization mechanisms ensures that resources (e.g.,
+   the barber chair and waiting room) are used efficiently, without wasting resources or causing unnecessary delays.
+2. Prevention of race conditions: By ensuring that only one customer is in the barber chair at a time and that the
+   barber is always working on a customer if there is one in the chair, synchronization mechanisms prevent race
+   conditions that could lead to errors or incorrect results.
+3. Fairness: Synchronization mechanisms can be used to ensure that all customers have a fair chance to be served by the
+   barber.
+
+Disadvantages:
+1. Complexity: Implementing synchronization mechanisms can be complex, especially for larger systems or more complex
+   synchronization scenarios.
+2. Overhead: Synchronization mechanisms can introduce overhead in terms of processing time, memory usage, and other
+   system resources.
+3. Deadlocks: Incorrectly implemented synchronization mechanisms can lead to deadlocks, where processes are unable to
+   proceed because they are waiting for resources that are held by other processes.
+4. Overall, the advantages of using synchronization mechanisms to solve the Sleeping Barber Problem generally outweigh
+   the disadvantages, as long as the mechanisms are implemented correctly and efficiently.
